@@ -65,3 +65,16 @@ void Block::deserialize(const std::string& data) {
 		}
 	}
 }
+
+std::vector<std::vector<int>> Block::calculatePlaces() {
+	std::vector<std::vector<int>> result;
+	for (int i = 0; i < (int)shape.size(); i++)
+	{
+		for (int j = 0; j < (int)shape[i].size(); j++) {
+			if (shape[i][j] == 1) {
+				result.push_back({ x + j, y + i });
+			}
+			return result;
+		}
+	}
+}

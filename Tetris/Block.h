@@ -11,8 +11,8 @@ private:
 	std::vector<std::vector<int>> shape;
 
 public:
-	Block(int type, int rotation, int x, int y, std::string color) :
-		type(type), rotation(rotation), x(x), y(y), color(color) {}
+	Block(int type, int rotation, int x, int y, std::string color, std::vector<std::vector<int>> shape) :
+		type(type), rotation(rotation), x(x), y(y), color(color), shape(shape) {}
 
 	std::string getColor();
 	int getRotation();
