@@ -74,7 +74,8 @@ std::vector<std::vector<int>> Block::calculatePlaces() {
 			if (shape[i][j] == 1) {
 				result.push_back({ x + j, y + i });
 			}
-			return result;
 		}
 	}
+
+	return result;
 }

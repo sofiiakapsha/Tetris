@@ -4,10 +4,10 @@
 class Board {
 private:
 	std::vector<std::vector<int>> grid;
-	static const int WIDTH = 10;
-	static const int HEIGHT = 20;
+	static const int width = 10;
+	static const int height = 20;
 public:
-	Board() = default;
+	Board() : grid(height, std::vector<int>(width, 0)) {}
 
 	bool canPlace(Block b);
 	bool placeFigure(Block b);
@@ -15,5 +15,5 @@ public:
 	bool isLineFull(int row);
 	void shiftDown(int row);
 	std::string serialize();
-	void deserialize(std::string data);
+	void deserialize(const std::string& data);
 };
