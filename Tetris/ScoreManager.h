@@ -15,4 +15,5 @@ public:
 	std::string serialize();
 	void deserialize(std::string data);
 	int getScore();
+	void reset();
 };

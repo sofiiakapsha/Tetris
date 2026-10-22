@@ -97,3 +97,13 @@ int Board::clearLines() {
 	return count;
 }
 
+
+void Board::addedFeature() {
+
+	int line = (int)grid.size();
+	int row = (int)grid[line].size();
+
+	for (int j = 0; j < row; ++j) {
+		grid[line][row] = 1;
+	}
+}

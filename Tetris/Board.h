@@ -12,6 +12,7 @@ public:
 	bool canPlace(Block b);
 	bool placeFigure(Block b);
 	int clearLines();
+	void addedFeature();
 	bool isLineFull(int row);
 	void shiftDown(int row);
 	std::string serialize();

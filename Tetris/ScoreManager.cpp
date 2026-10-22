@@ -2,6 +2,7 @@
 #include <sstream>
 
 void ScoreManager::addLines(int n) {
+	if (n <= 0 || n > 4) return;
 	static const int points[] = { 0, 100, 300, 500, 800 };
 	int gotScore = points[n];
 	score += gotScore;
@@ -29,3 +30,5 @@ void ScoreManager::deserialize(std::string data) {
 	std::getline(ss, part, ';'); 
 	bestScore = std::stoi(part);
 }
+
+void ScoreManager::reset() { score = 0; }
