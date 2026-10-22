@@ -17,6 +17,8 @@ void Game::resume() { state = GameState::PLAYING; }
 
 void Game::end() { state = GameState::GAME_OVER; }
 
+void Game::toMenu() { state = GameState::MENU; }
+
 bool Game::isGrounded() {
 	currentPiece.move(0, 1);
 	bool free = board.canPlace(currentPiece);
@@ -31,22 +33,7 @@ void Game::timer(float dt) {
 		lockTimer += dt;
 		if (lockTimer >= lockDelay) {
 			lockTimer = 0;
-			board.placeFigure(currentPiece);
-
-			int n = board.clearLines();
-			if (n > 0) {
-				score.addLines(n);
-
-				int diff = score.getBest() - score.getScore();
-				if (!bonusUsed && score.getBest() > 0 && diff >= 0 && diff <= 50) {
-					board.addedFeature();
-					int bonus = board.clearLines();
-					score.addLines(bonus);
-					bonusUsed = true;
-				}
-			}
-
-			newFigure();
+			lockPiece();
 		}
 	}
 	else {
@@ -57,6 +44,36 @@ void Game::timer(float dt) {
 			currentPiece.move(0, 1);
 		}
 	}
+}
+
+void Game::lockPiece() {
+	board.placeFigure(currentPiece);
+
+	bool danger = isCloseToLose();
+	int diff = score.getBest() - score.getScore();
+
+	int n = board.clearLines();
+	if (n > 0) {
+		score.addLines(n);
+
+		if (!bonusUsed && danger && diff > 0 && diff <= bonusRange) {
+			board.addedFeature();
+			int bonus = board.clearLines();
+			score.addLines(bonus);
+			bonusUsed = true;
+		}
+	}
+
+	newFigure();
+}
+
+bool Game::isCloseToLose() {
+	for (int y = 0; y < 5; y++) {
+		for (int x = 0; x < board.getWidth(); x++) {
+			if (board.getCell(x, y) != 0) return true;
+		}
+	}
+	return false;
 }
 
 bool Game::moveLeft() {
@@ -107,6 +124,10 @@ GameState Game::getState() { return state; }
 
 int Game::getScore() { return score.getScore(); }
 
+int Game::getBestScore() { return score.getBest(); }
+
+void Game::setBestScore(int s) { score.setBestScore(s); }
+
 std::string Game::serialize() {
 	return "GA:" + board.serialize() + "\n" +
 		currentPiece.serialize() + "\n" +
@@ -114,7 +135,7 @@ std::string Game::serialize() {
 }
 
 void Game::deserialize(std::string data) {
-	std::stringstream ss(data.substr(3)); 
+	std::stringstream ss(data.substr(3));
 	std::string b, p, s;
 	std::getline(ss, b, '\n');
 	std::getline(ss, p, '\n');

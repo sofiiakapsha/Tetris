@@ -17,7 +17,7 @@ bool Board::placeFigure(Block b) {
 	if (!canPlace(b)) return false;
 
 	for (const auto& cell : b.calculatePlaces()) {
-		grid[cell[1]][cell[0]] = 1;
+		grid[cell[1]][cell[0]] = b.getType() + 1;
 	}
 	return true;
 }
@@ -27,11 +27,11 @@ bool Board::isLineFull(int row) {
 	for (int i = 0; i < (int)grid.size(); ++i) {
 		int count = 0;
 		for (int j = 0; j < (int)grid[i].size(); ++j) {
-			if (i == row && grid[i][j] == 1) {
+			if (i == row && grid[i][j] != 0) {
 				count++;
 			}
 
-			if (count == 10) {
+			if (count == width) {
 				return true;
 			}
 		}
@@ -100,10 +100,19 @@ int Board::clearLines() {
 
 void Board::addedFeature() {
 
-	int line = (int)grid.size();
+	int line = (int)grid.size() - 1;
 	int row = (int)grid[line].size();
 
 	for (int j = 0; j < row; ++j) {
-		grid[line][row] = 1;
+		grid[line][j] = 1;
 	}
 }
+
+int Board::getCell(int x, int y) const {
+	if (x < 0 || x >= width || y < 0 || y >= height) return 0;
+	return grid[y][x];
+}
+
+int Board::getWidth() const { return width; }
+
+int Board::getHeight() const { return height; }

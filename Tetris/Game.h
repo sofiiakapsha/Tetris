@@ -23,18 +23,22 @@ private:
 	float fallInterval;
 	float lockDelay;
 	bool bonusUsed;
+	int bonusRange;
 
 	bool isGrounded();
+	bool isCloseToLose();
 	void lockPiece();
 
 public:
-	Game() : state(GameState::MENU), fallTimer(0), lockTimer(0),
-		fallInterval(0.5f), lockDelay(0.3f), bonusUsed(false) {};
+	Game() : currentPiece(factory.createRandom()), state(GameState::MENU), score(0, 0), fallTimer(0), lockTimer(0),
+		fallInterval(0.5f), lockDelay(0.3f), bonusUsed(false), bonusRange(100) {
+	};
 
 	void start();
 	void pause();
 	void resume();
 	void end();
+	void toMenu();
 	void timer(float dt);
 	bool moveLeft();
 	bool moveRight();
@@ -46,6 +50,8 @@ public:
 	Block& getCurrentPiece();
 	GameState getState();
 	int getScore();
+	int getBestScore();
+	void setBestScore(int s);
 
 	std::string serialize();
 	void deserialize(std::string data);

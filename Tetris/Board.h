@@ -15,6 +15,9 @@ public:
 	void addedFeature();
 	bool isLineFull(int row);
 	void shiftDown(int row);
+	int getCell(int x, int y) const;
+	int getWidth() const;
+	int getHeight() const;
 	std::string serialize();
 	void deserialize(const std::string& data);
 };
