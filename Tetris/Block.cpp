@@ -17,9 +17,11 @@ void Block::rotate() {
 	rotation = (rotation + 1) % 4;
 	int n = shape.size();
 	std::vector<std::vector<int>> rotated(n, std::vector<int>(n));
-	for (int i = 0; i < n; i++)
-		for (int j = 0; j < n; j++)
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
 			rotated[j][n - 1 - i] = shape[i][j];
+		}
+	}
 	shape = rotated;
 }
 
