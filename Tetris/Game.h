@@ -31,7 +31,7 @@ private:
 
 public:
 	Game() : currentPiece(factory.createRandom()), state(GameState::MENU), score(0, 0), fallTimer(0), lockTimer(0),
-		fallInterval(0.5f), lockDelay(0.3f), bonusUsed(false), bonusRange(100) {
+		fallInterval(0.5f), lockDelay(0.3f), bonusUsed(false), bonusRange(50) {
 	};
 
 	void start();
