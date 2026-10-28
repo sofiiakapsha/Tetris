@@ -7,17 +7,42 @@ void Game::start() {
 	fallTimer = 0;
 	lockTimer = 0;
 	bonusUsed = false;
-	state = GameState::PLAYING;
+	setState(std::make_unique<PlayingState>());
 	newFigure();
 }
 
-void Game::pause() { state = GameState::PAUSED; }
+void Game::pause() { setState(std::make_unique<PausedState>()); }
 
-void Game::resume() { state = GameState::PLAYING; }
+void Game::resume() { setState(std::make_unique<PlayingState>()); }
 
-void Game::end() { state = GameState::GAME_OVER; }
+void Game::end() { setState(std::make_unique<GameOverState>()); }
 
-void Game::toMenu() { state = GameState::MENU; }
+void Game::toMenu() {
+	setState(std::make_unique<MenuState>());
+	applyState();
+}
+
+void Game::setState(std::unique_ptr<State> newState) {
+	nextState = std::move(newState);
+}
+
+void Game::applyState() {
+	if (nextState) {
+		state = std::move(nextState);
+	}
+}
+
+void Game::onPauseKey() {
+	state->onPauseKey(*this);
+	applyState();
+}
+
+void Game::onStartKey() {
+	state->onStartKey(*this);
+	applyState();
+}
+
+bool Game::canSave() { return state->canSave(); }
 
 bool Game::isGrounded() {
 	currentPiece.move(0, 1);
@@ -27,8 +52,11 @@ bool Game::isGrounded() {
 }
 
 void Game::timer(float dt) {
-	if (state != GameState::PLAYING) return;
+	state->update(*this, dt);
+	applyState();
+}
 
+void Game::applyGravity(float dt) {
 	if (isGrounded()) {
 		lockTimer += dt;
 		if (lockTimer >= lockDelay) {
@@ -77,7 +105,7 @@ bool Game::isCloseToLose() {
 }
 
 bool Game::moveLeft() {
-	if (state != GameState::PLAYING) return false;
+	if (!state->canControl()) return false;
 	currentPiece.move(-1, 0);
 	if (board.canPlace(currentPiece)) { return true; }
 	currentPiece.move(1, 0);
@@ -85,7 +113,7 @@ bool Game::moveLeft() {
 }
 
 bool Game::moveRight() {
-	if (state != GameState::PLAYING) return false;
+	if (!state->canControl()) return false;
 	currentPiece.move(1, 0);
 	if (board.canPlace(currentPiece)) { return true; }
 	currentPiece.move(-1, 0);
@@ -93,7 +121,7 @@ bool Game::moveRight() {
 }
 
 bool Game::rotate() {
-	if (state != GameState::PLAYING) return false;
+	if (!state->canControl()) return false;
 	Block backup = currentPiece;
 	currentPiece.rotate();
 	if (board.canPlace(currentPiece)) return true;
@@ -102,9 +130,19 @@ bool Game::rotate() {
 }
 
 void Game::speedUp() {
-	if (state != GameState::PLAYING) return;
+	if (!state->canControl()) return;
 	currentPiece.move(0, 1);
 	if (!board.canPlace(currentPiece)) currentPiece.move(0, -1);
+}
+
+void Game::hardDrop() {
+	if (!state->canControl()) return;
+	while (!isGrounded()) {
+		currentPiece.move(0, 1);
+	}
+	fallTimer = 0;
+	lockTimer = 0;
+	lockPiece();
 }
 
 bool Game::newFigure() {
@@ -120,7 +158,7 @@ Board& Game::getBoard() { return board; }
 
 Block& Game::getCurrentPiece() { return currentPiece; }
 
-GameState Game::getState() { return state; }
+GameState Game::getState() { return state->getType(); }
 
 int Game::getScore() { return score.getScore(); }
 
@@ -145,7 +183,8 @@ void Game::deserialize(std::string data) {
 	currentPiece.deserialize(p);
 	score.deserialize(s);
 
-	state = GameState::PAUSED;
+	setState(std::make_unique<PausedState>());
+	applyState();
 	fallTimer = 0;
 	lockTimer = 0;
 }

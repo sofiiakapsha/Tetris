@@ -146,6 +146,7 @@
     <ClCompile Include="BlockFactory.cpp" />
     <ClCompile Include="BlockFactory.h" />
     <ClCompile Include="Board.cpp" />
+    <ClCompile Include="Command.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -153,15 +154,18 @@
     <ClCompile Include="SaveManager.h" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ScoreManager.cpp" />
+    <ClCompile Include="State.cpp" />
     <ClCompile Include="Tetris.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Block.h" />
     <ClInclude Include="Board.h" />
+    <ClInclude Include="Command.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="InputHandler.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ScoreManager.h" />
+    <ClInclude Include="State.h" />
     <ClInclude Include="Tetris.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -3,20 +3,16 @@
 #include "BlockFactory.h"
 #include "ScoreManager.h"
 #include "Block.h"
-
-enum class GameState {
-	MENU,
-	PLAYING,
-	PAUSED,
-	GAME_OVER
-};
+#include "State.h"
+#include <memory>
 
 class Game {
 private:
 	BlockFactory factory;
 	Board board;
 	Block currentPiece;
-	GameState state;
+	std::unique_ptr<State> state;
+	std::unique_ptr<State> nextState;
 	ScoreManager score;
 	float fallTimer;
 	float lockTimer;
@@ -28,10 +24,11 @@ private:
 	bool isGrounded();
 	bool isCloseToLose();
 	void lockPiece();
+	void applyState();
 
 public:
-	Game() : currentPiece(factory.createRandom()), state(GameState::MENU), score(0, 0), fallTimer(0), lockTimer(0),
-		fallInterval(0.5f), lockDelay(0.3f), bonusUsed(false), bonusRange(50) {
+	Game() : currentPiece(factory.createRandom()), state(std::make_unique<MenuState>()), score(0, 0), fallTimer(0), lockTimer(0),
+		fallInterval(0.5f), lockDelay(0.3f), bonusUsed(false), bonusRange(100) {
 	};
 
 	void start();
@@ -40,11 +37,17 @@ public:
 	void end();
 	void toMenu();
 	void timer(float dt);
+	void applyGravity(float dt);
+	void setState(std::unique_ptr<State> newState);
+	void onPauseKey();
+	void onStartKey();
+	bool canSave();
 	bool moveLeft();
 	bool moveRight();
 	bool rotate();
-	void speedUp();
 	bool newFigure();
+	void speedUp();
+	void hardDrop();
 
 	Board& getBoard();
 	Block& getCurrentPiece();

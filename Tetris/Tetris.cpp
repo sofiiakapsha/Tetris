@@ -3,26 +3,9 @@
 #include <windows.h>
 
 Tetris::Tetris() : input(game), isRun(true) {
-	input.bind("s", [&]() {
-		if (game.getState() == GameState::PAUSED) {
-			saveManager.save("save.txt", game.serialize());
-		}
-		});
-
-	input.bind("l", [&]() {
-		std::string data = saveManager.load("save.txt");
-		if (!data.empty()) {
-			int best = game.getBestScore();
-			game.deserialize(data);
-			if (game.getBestScore() < best) game.setBestScore(best);
-		}
-		});
-	input.bind(" ", [&]() {
-		if (game.getState() == GameState::MENU || game.getState() == GameState::GAME_OVER) {
-			game.start();
-		}
-		});
-	input.bind("q", [&]() { isRun = false; });
+	input.bind("s", std::make_unique<SaveCommand>(saveManager));
+	input.bind("l", std::make_unique<LoadCommand>(saveManager));
+	input.bind("q", std::make_unique<QuitCommand>(isRun));
 }
 
 std::string Tetris::readKey() {
@@ -40,7 +23,7 @@ std::string Tetris::readKey() {
 
 void Tetris::run() {
 	game.setBestScore(saveManager.loadBestScore());
-	bool bestSaved = false;
+	int savedBest = game.getBestScore();
 
 	while (isRun) {
 		if (_kbhit()) {
@@ -53,16 +36,11 @@ void Tetris::run() {
 		renderer.drawScore(game.getScore(), game.getBestScore());
 		renderer.drawState(game.getState());
 
-		if (game.getState() == GameState::GAME_OVER && !bestSaved) {
+		if (game.getBestScore() > savedBest) {
 			saveManager.saveBestScore(game.getBestScore());
-			bestSaved = true;
-		}
-		if (game.getState() == GameState::PLAYING) {
-			bestSaved = false;
+			savedBest = game.getBestScore();
 		}
 
 		Sleep(50);
 	}
-
-	saveManager.saveBestScore(game.getBestScore());
 }
