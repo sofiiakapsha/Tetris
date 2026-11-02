@@ -54,3 +54,9 @@ void Renderer::drawState(const State& state) {
 	text.resize(45, ' ');
 	std::cout << text << "\n";
 }
+
+void Renderer::drawMessage(const std::string& text) {
+	std::string line = text;
+	line.resize(45, ' ');
+	std::cout << line << "\n";
+}

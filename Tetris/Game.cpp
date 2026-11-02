@@ -43,6 +43,10 @@ void Game::onStartKey() {
 }
 
 void Game::timer(float dt) {
+	if (messageTimer > 0) {
+		messageTimer -= dt;
+		if (messageTimer <= 0) message.clear();
+	}
 	applyState();
 	state->update(*this, dt);
 	applyState();
@@ -205,3 +209,10 @@ void Game::deserialize(const std::string& data) {
 	lockTimer = 0;
 	bonusUsed = false;
 }
+
+void Game::showMessage(const std::string& text) {
+	message = text;
+	messageTimer = 2.0f;
+}
+
+const std::string& Game::getMessage() const { return message; }

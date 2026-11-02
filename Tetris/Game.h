@@ -28,6 +28,9 @@ private:
 	int bonusRange;
 	bool quit;
 
+	std::string message;
+	float messageTimer;
+
 	void start();
 	void pause();
 	void resume();
@@ -45,7 +48,7 @@ private:
 
 public:
 	Game() : currentPiece(factory.createRandom()), state(std::make_unique<MenuState>()), score(0, 0), fallTimer(0), lockTimer(0),
-		fallInterval(0.5f), lockDelay(0.3f), bonusUsed(false), bonusRange(100), quit(false) {
+		fallInterval(0.5f), lockDelay(0.3f), bonusUsed(false), bonusRange(100), quit(false), message(""), messageTimer(0) {
 	}
 
 	void timer(float dt);
@@ -72,4 +75,7 @@ public:
 
 	std::string serialize() const;
 	void deserialize(const std::string& data);
+
+	void showMessage(const std::string& text);
+	const std::string& getMessage() const;
 };

@@ -12,4 +12,5 @@ public:
 	void draw(const Board& b, const Block& current);
 	void drawScore(int score, int best);
 	void drawState(const State& state);
+	void drawMessage(const std::string& text);
 };

@@ -34,6 +34,7 @@ void Tetris::run() {
 		renderer.draw(game.getBoard(), game.getCurrentPiece());
 		renderer.drawScore(game.getScore(), game.getBestScore());
 		renderer.drawState(game.getState());
+		renderer.drawMessage(game.getMessage());   
 
 		if (game.getBestScore() > savedBest) {
 			saveManager.saveBestScore(game.getBestScore());
