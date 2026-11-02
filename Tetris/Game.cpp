@@ -1,5 +1,6 @@
 #include "Game.h"
 #include <sstream>
+#include <stdexcept>
 
 void Game::start() {
 	board = Board();
@@ -17,10 +18,7 @@ void Game::resume() { setState(std::make_unique<PlayingState>()); }
 
 void Game::end() { setState(std::make_unique<GameOverState>()); }
 
-void Game::toMenu() {
-	setState(std::make_unique<MenuState>());
-	applyState();
-}
+void Game::toMenu() { setState(std::make_unique<MenuState>()); }
 
 void Game::setState(std::unique_ptr<State> newState) {
 	nextState = std::move(newState);
@@ -33,27 +31,29 @@ void Game::applyState() {
 }
 
 void Game::onPauseKey() {
+	applyState();
 	state->onPauseKey(*this);
 	applyState();
 }
 
 void Game::onStartKey() {
+	applyState();
 	state->onStartKey(*this);
 	applyState();
 }
 
-bool Game::canSave() { return state->canSave(); }
-
-bool Game::isGrounded() {
-	currentPiece.move(0, 1);
-	bool free = board.canPlace(currentPiece);
-	currentPiece.move(0, -1);
-	return !free;
-}
-
 void Game::timer(float dt) {
+	applyState();
 	state->update(*this, dt);
 	applyState();
+}
+
+bool Game::canSave() const { return state->canSave(); }
+
+bool Game::isGrounded() const {
+	Block test = currentPiece;
+	test.move(0, 1);
+	return !board.canPlace(test);
 }
 
 void Game::applyGravity(float dt) {
@@ -95,7 +95,7 @@ void Game::lockPiece() {
 	newFigure();
 }
 
-bool Game::isCloseToLose() {
+bool Game::isCloseToLose() const {
 	for (int y = 0; y < 5; y++) {
 		for (int x = 0; x < board.getWidth(); x++) {
 			if (board.getCell(x, y) != 0) return true;
@@ -154,37 +154,54 @@ bool Game::newFigure() {
 	return true;
 }
 
-Board& Game::getBoard() { return board; }
+const Board& Game::getBoard() const { return board; }
 
-Block& Game::getCurrentPiece() { return currentPiece; }
+const Block& Game::getCurrentPiece() const { return currentPiece; }
 
-GameState Game::getState() { return state->getType(); }
+const State& Game::getState() const { return *state; }
 
-int Game::getScore() { return score.getScore(); }
+int Game::getScore() const { return score.getScore(); }
 
-int Game::getBestScore() { return score.getBest(); }
+int Game::getBestScore() const { return score.getBest(); }
 
 void Game::setBestScore(int s) { score.setBestScore(s); }
 
-std::string Game::serialize() {
+void Game::requestQuit() { quit = true; }
+
+bool Game::quitRequested() const { return quit; }
+
+std::string Game::serialize() const {
 	return "GA:" + board.serialize() + "\n" +
 		currentPiece.serialize() + "\n" +
 		score.serialize();
 }
 
-void Game::deserialize(std::string data) {
+void Game::deserialize(const std::string& data) {
+	if (data.compare(0, 3, "GA:") != 0) throw std::runtime_error("bad save");
+
 	std::stringstream ss(data.substr(3));
 	std::string b, p, s;
-	std::getline(ss, b, '\n');
-	std::getline(ss, p, '\n');
-	std::getline(ss, s, '\n');
+	if (!std::getline(ss, b, '\n') ||
+		!std::getline(ss, p, '\n') ||
+		!std::getline(ss, s, '\n')) {
+		throw std::runtime_error("bad save");
+	}
 
-	board.deserialize(b);
-	currentPiece.deserialize(p);
-	score.deserialize(s);
+	Board newBoard;
+	newBoard.deserialize(b);
+	Block newPiece = currentPiece;
+	newPiece.deserialize(p);
+	ScoreManager newScore = score;
+	newScore.deserialize(s);
+
+	if (!newBoard.canPlace(newPiece)) throw std::runtime_error("bad piece position");
+
+	board = std::move(newBoard);
+	currentPiece = std::move(newPiece);
+	score = std::move(newScore);
 
 	setState(std::make_unique<PausedState>());
-	applyState();
 	fallTimer = 0;
 	lockTimer = 0;
+	bonusUsed = false;
 }

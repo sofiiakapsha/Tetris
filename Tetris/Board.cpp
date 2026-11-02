@@ -1,8 +1,9 @@
 #include "Board.h"
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
-bool Board::canPlace(Block b) {
+bool Board::canPlace(const Block& b) const {
 	for (const auto& cell : b.calculatePlaces()) {
 		int px = cell[0];
 		int py = cell[1];
@@ -13,7 +14,7 @@ bool Board::canPlace(Block b) {
 	return true;
 }
 
-bool Board::placeFigure(Block b) {
+bool Board::placeFigure(const Block& b) {
 	if (!canPlace(b)) return false;
 
 	for (const auto& cell : b.calculatePlaces()) {
@@ -22,22 +23,12 @@ bool Board::placeFigure(Block b) {
 	return true;
 }
 
-bool Board::isLineFull(int row) {
-
-	for (int i = 0; i < (int)grid.size(); ++i) {
-		int count = 0;
-		for (int j = 0; j < (int)grid[i].size(); ++j) {
-			if (i == row && grid[i][j] != 0) {
-				count++;
-			}
-
-			if (count == width) {
-				return true;
-			}
-		}
+bool Board::isLineFull(int row) const {
+	if (row < 0 || row >= height) return false;
+	for (int c : grid[row]) {
+		if (c == 0) return false;
 	}
-
-	return false;
+	return true;
 }
 
 void Board::shiftDown(int row) {
@@ -47,7 +38,7 @@ void Board::shiftDown(int row) {
 	grid[0].assign(width, 0);
 }
 
-std::string Board::serialize() {
+std::string Board::serialize() const {
 	int h = grid.size();
 	int w = grid[0].size();
 	std::string cells;
@@ -61,6 +52,8 @@ std::string Board::serialize() {
 }
 
 void Board::deserialize(const std::string& data) {
+	if (data.compare(0, 3, "BO:") != 0) throw std::runtime_error("bad board");
+
 	std::stringstream ss(data.substr(3));
 	std::string part;
 
@@ -71,15 +64,20 @@ void Board::deserialize(const std::string& data) {
 	std::string cells;
 	std::getline(ss, cells, ';');
 
-	grid.assign(h, std::vector<int>(w, 0));
+	if (h != height || w != width || cells.size() != static_cast<size_t>(h) * w) {
+		throw std::runtime_error("bad board");
+	}
 
+	std::vector<std::vector<int>> newGrid(h, std::vector<int>(w, 0));
 	for (int i = 0; i < h; i++) {
 		for (int j = 0; j < w; j++) {
-			grid[i][j] = cells[i * w + j] - '0';
+			int v = cells[i * w + j] - '0';
+			if (v < 0 || v > 7) throw std::runtime_error("bad board cell");
+			newGrid[i][j] = v;
 		}
 	}
+	grid = std::move(newGrid);
 }
-
 
 int Board::clearLines() {
 	int count = 0;
@@ -97,9 +95,7 @@ int Board::clearLines() {
 	return count;
 }
 
-
 void Board::addedFeature() {
-
 	int line = (int)grid.size() - 1;
 	int row = (int)grid[line].size();
 

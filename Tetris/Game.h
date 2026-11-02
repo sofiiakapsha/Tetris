@@ -5,8 +5,14 @@
 #include "Block.h"
 #include "State.h"
 #include <memory>
+#include <string>
 
 class Game {
+	friend class MenuState;
+	friend class PlayingState;
+	friend class PausedState;
+	friend class GameOverState;
+
 private:
 	BlockFactory factory;
 	Board board;
@@ -20,42 +26,50 @@ private:
 	float lockDelay;
 	bool bonusUsed;
 	int bonusRange;
-
-	bool isGrounded();
-	bool isCloseToLose();
-	void lockPiece();
-	void applyState();
-
-public:
-	Game() : currentPiece(factory.createRandom()), state(std::make_unique<MenuState>()), score(0, 0), fallTimer(0), lockTimer(0),
-		fallInterval(0.5f), lockDelay(0.3f), bonusUsed(false), bonusRange(50) {
-	};
+	bool quit;
 
 	void start();
 	void pause();
 	void resume();
 	void end();
-	void toMenu();
-	void timer(float dt);
+	void hardDrop();
 	void applyGravity(float dt);
+
 	void setState(std::unique_ptr<State> newState);
+	void applyState();
+
+	void lockPiece();
+	bool newFigure();
+	bool isGrounded() const;
+	bool isCloseToLose() const;
+
+public:
+	Game() : currentPiece(factory.createRandom()), state(std::make_unique<MenuState>()), score(0, 0), fallTimer(0), lockTimer(0),
+		fallInterval(0.5f), lockDelay(0.3f), bonusUsed(false), bonusRange(100), quit(false) {
+	}
+
+	void timer(float dt);
 	void onPauseKey();
 	void onStartKey();
-	bool canSave();
+	void toMenu();
+
 	bool moveLeft();
 	bool moveRight();
 	bool rotate();
-	bool newFigure();
 	void speedUp();
-	void hardDrop();
 
-	Board& getBoard();
-	Block& getCurrentPiece();
-	GameState getState();
-	int getScore();
-	int getBestScore();
+	bool canSave() const;
+
+	const Board& getBoard() const;
+	const Block& getCurrentPiece() const;
+	const State& getState() const;
+	int getScore() const;
+	int getBestScore() const;
 	void setBestScore(int s);
 
-	std::string serialize();
-	void deserialize(std::string data);
+	void requestQuit();
+	bool quitRequested() const;
+
+	std::string serialize() const;
+	void deserialize(const std::string& data);
 };

@@ -11,13 +11,9 @@ Renderer::Renderer() {
 	GetConsoleCursorInfo(console, &info);
 	info.bVisible = FALSE;
 	SetConsoleCursorInfo(console, &info);
-
-	hints[GameState::MENU] = "SPACE - start, L - load, Q - quit";
-	hints[GameState::PLAYING] = "Arrows - move/rotate, SPACE - drop, P - pause";	hints[GameState::PAUSED] = "PAUSED: P - resume, S - save, M - menu";
-	hints[GameState::GAME_OVER] = "GAME OVER: SPACE - again, M - menu";
 }
 
-void Renderer::draw(const Board& b, Block current) {
+void Renderer::draw(const Board& b, const Block& current) {
 	int w = b.getWidth();
 	int h = b.getHeight();
 	std::vector<std::string> lines(h, std::string(w, '.'));
@@ -53,8 +49,8 @@ void Renderer::drawScore(int score, int best) {
 	std::cout << text << "\n";
 }
 
-void Renderer::drawState(GameState state) {
-	std::string text = hints[state];
+void Renderer::drawState(const State& state) {
+	std::string text = state.hint();
 	text.resize(45, ' ');
 	std::cout << text << "\n";
 }

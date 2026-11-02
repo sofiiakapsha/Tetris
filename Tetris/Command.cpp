@@ -1,5 +1,6 @@
 #include "Command.h"
 #include <string>
+#include <exception>
 
 void MoveLeftCommand::execute(Game& g) { g.moveLeft(); }
 
@@ -23,11 +24,16 @@ void SaveCommand::execute(Game& g) {
 
 void LoadCommand::execute(Game& g) {
 	std::string data = saveManager.load("save.txt");
-	if (!data.empty()) {
-		int best = g.getBestScore();
+	if (data.empty()) return;
+
+	int best = g.getBestScore();
+	try {
 		g.deserialize(data);
-		if (g.getBestScore() < best) g.setBestScore(best);
 	}
+	catch (const std::exception&) {
+		return;
+	}
+	if (g.getBestScore() < best) g.setBestScore(best);
 }
 
-void QuitCommand::execute(Game& g) { isRun = false; }
+void QuitCommand::execute(Game& g) { g.requestQuit(); }

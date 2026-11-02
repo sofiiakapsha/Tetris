@@ -1,15 +1,16 @@
 #include "Block.h"
 #include <sstream>
+#include <stdexcept>
 
-std::string Block::getColor() {
+std::string Block::getColor() const {
 	return color;
 }
 
-int Block::getRotation() {
+int Block::getRotation() const {
 	return rotation;
 }
 
-int Block::getType() {
+int Block::getType() const {
 	return type;
 }
 
@@ -30,7 +31,7 @@ void Block::move(int dx, int dy) {
 	y += dy;
 }
 
-std::string Block::serialize() {
+std::string Block::serialize() const {
 	int n = shape.size();
 	std::string cells;
 	for (const auto& row : shape) {
@@ -45,30 +46,48 @@ std::string Block::serialize() {
 }
 
 void Block::deserialize(const std::string& data) {
+	if (data.compare(0, 3, "BL:") != 0) throw std::runtime_error("bad block");
+
 	std::stringstream ss(data.substr(3));
 	std::string part;
 
-	std::getline(ss, part, ';'); type = std::stoi(part);
-	std::getline(ss, part, ';'); rotation = std::stoi(part);
-	std::getline(ss, part, ';'); x = std::stoi(part);
-	std::getline(ss, part, ';'); y = std::stoi(part);
-	std::getline(ss, color, ';');
+	std::getline(ss, part, ';'); int newType = std::stoi(part);
+	std::getline(ss, part, ';'); int newRotation = std::stoi(part);
+	std::getline(ss, part, ';'); int newX = std::stoi(part);
+	std::getline(ss, part, ';'); int newY = std::stoi(part);
+	std::string newColor;
+	std::getline(ss, newColor, ';');
 
 	std::getline(ss, part, ';');
 	int n = std::stoi(part);
 	std::string cells;
 	std::getline(ss, cells, ';');
 
-	shape.assign(n, std::vector<int>(n));
+	if (newType < 0 || newType > 6 ||
+		newRotation < 0 || newRotation > 3 ||
+		n < 1 || n > 4 ||
+		cells.size() != static_cast<size_t>(n) * n) {
+		throw std::runtime_error("bad block");
+	}
 
+	std::vector<std::vector<int>> newShape(n, std::vector<int>(n));
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < n; j++) {
-			shape[i][j] = cells[i * n + j] - '0';
+			int v = cells[i * n + j] - '0';
+			if (v != 0 && v != 1) throw std::runtime_error("bad block cell");
+			newShape[i][j] = v;
 		}
 	}
+
+	type = newType;
+	rotation = newRotation;
+	x = newX;
+	y = newY;
+	color = newColor;
+	shape = std::move(newShape);
 }
 
-std::vector<std::vector<int>> Block::calculatePlaces() {
+std::vector<std::vector<int>> Block::calculatePlaces() const {
 	std::vector<std::vector<int>> result;
 	for (int i = 0; i < (int)shape.size(); i++)
 	{

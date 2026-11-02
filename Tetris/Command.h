@@ -60,9 +60,6 @@ public:
 };
 
 class QuitCommand : public Command {
-private:
-	bool& isRun;
 public:
-	QuitCommand(bool& run) : isRun(run) {}
 	void execute(Game& g) override;
 };

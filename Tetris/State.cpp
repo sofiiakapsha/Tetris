@@ -3,27 +3,27 @@
 
 void MenuState::onStartKey(Game& g) { g.start(); }
 
-GameState MenuState::getType() { return GameState::MENU; }
+std::string MenuState::hint() const { return "SPACE - start, L - load, Q - quit"; }
 
 
 void PlayingState::update(Game& g, float dt) { g.applyGravity(dt); }
 
 void PlayingState::onPauseKey(Game& g) { g.pause(); }
 
-bool PlayingState::canControl() { return true; }
-
-GameState PlayingState::getType() { return GameState::PLAYING; }
-
 void PlayingState::onStartKey(Game& g) { g.hardDrop(); }
+
+bool PlayingState::canControl() const { return true; }
+
+std::string PlayingState::hint() const { return "Arrows - move/rotate, SPACE - drop, P - pause"; }
 
 
 void PausedState::onPauseKey(Game& g) { g.resume(); }
 
-bool PausedState::canSave() { return true; }
+bool PausedState::canSave() const { return true; }
 
-GameState PausedState::getType() { return GameState::PAUSED; }
+std::string PausedState::hint() const { return "PAUSED: P - resume, S - save, M - menu"; }
 
 
 void GameOverState::onStartKey(Game& g) { g.start(); }
 
-GameState GameOverState::getType() { return GameState::GAME_OVER; }
+std::string GameOverState::hint() const { return "GAME OVER: SPACE - again, M - menu"; }

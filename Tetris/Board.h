@@ -9,15 +9,15 @@ private:
 public:
 	Board() : grid(height, std::vector<int>(width, 0)) {}
 
-	bool canPlace(Block b);
-	bool placeFigure(Block b);
+	bool canPlace(const Block& b) const;
+	bool placeFigure(const Block& b);
 	int clearLines();
 	void addedFeature();
-	bool isLineFull(int row);
+	bool isLineFull(int row) const;
 	void shiftDown(int row);
 	int getCell(int x, int y) const;
 	int getWidth() const;
 	int getHeight() const;
-	std::string serialize();
+	std::string serialize() const;
 	void deserialize(const std::string& data);
 };

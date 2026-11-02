@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 
-
 class ScoreManager {
 private:
 	int score;
@@ -10,10 +9,10 @@ public:
 	ScoreManager(int score, int bestScore) : score(score), bestScore(bestScore) {};
 
 	void addLines(int n);
-	int getBest();
+	int getBest() const;
 	void setBestScore(int s);
-	std::string serialize();
-	void deserialize(std::string data);
-	int getScore();
+	std::string serialize() const;
+	void deserialize(const std::string& data);
+	int getScore() const;
 	void reset();
 };

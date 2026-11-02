@@ -11,8 +11,6 @@ private:
 	Renderer renderer;
 	SaveManager saveManager;
 	InputHandler input;
-	bool isRun;
-
 	std::string readKey();
 public:
 	Tetris();

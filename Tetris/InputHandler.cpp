@@ -8,6 +8,7 @@ InputHandler::InputHandler(Game& g) : game(g) {
 	bind("p", std::make_unique<PauseCommand>());
 	bind(" ", std::make_unique<StartCommand>());
 	bind("m", std::make_unique<MenuCommand>());
+	bind("q", std::make_unique<QuitCommand>());
 }
 
 void InputHandler::onKeyPressed(std::string key) {

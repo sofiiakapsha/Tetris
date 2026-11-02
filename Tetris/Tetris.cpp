@@ -2,10 +2,9 @@
 #include <conio.h>
 #include <windows.h>
 
-Tetris::Tetris() : input(game), isRun(true) {
+Tetris::Tetris() : input(game) {
 	input.bind("s", std::make_unique<SaveCommand>(saveManager));
 	input.bind("l", std::make_unique<LoadCommand>(saveManager));
-	input.bind("q", std::make_unique<QuitCommand>(isRun));
 }
 
 std::string Tetris::readKey() {
@@ -25,7 +24,7 @@ void Tetris::run() {
 	game.setBestScore(saveManager.loadBestScore());
 	int savedBest = game.getBestScore();
 
-	while (isRun) {
+	while (!game.quitRequested()) {
 		if (_kbhit()) {
 			input.onKeyPressed(readKey());
 		}
