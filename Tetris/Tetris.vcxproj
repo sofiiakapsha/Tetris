@@ -150,6 +150,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="RendererSFML.cpp" />
     <ClCompile Include="SaveManager.cpp" />
     <ClCompile Include="SaveManager.h" />
     <ClCompile Include="Main.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="InputHandler.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RendererSFML.h" />
     <ClInclude Include="ScoreManager.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="Tetris.h" />
