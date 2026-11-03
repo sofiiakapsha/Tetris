@@ -9,7 +9,6 @@ class RendererSFML {
 private:
 	sf::RenderWindow& window;
 	sf::Font font;
-	const float cell = 30.f;
 
 	void drawCell(int x, int y, const sf::Color& color);
 	void drawText(const std::string& text, float x, float y, unsigned size);

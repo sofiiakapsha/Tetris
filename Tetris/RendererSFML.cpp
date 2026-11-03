@@ -1,5 +1,7 @@
 #include "RendererSFML.h"
 
+const float cell = 30.f;
+
 const sf::Color colors[7] = {
 	sf::Color::Cyan, sf::Color::Yellow, sf::Color(160, 60, 220),
 	sf::Color::Green, sf::Color::Red, sf::Color::Blue, sf::Color(240, 150, 0)
