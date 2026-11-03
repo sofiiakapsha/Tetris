@@ -21,15 +21,47 @@ void RendererSFML::drawText(const std::string& text, float x, float y, unsigned 
 }
 
 void RendererSFML::drawCell(int x, int y, const sf::Color& color) {
-	sf::RectangleShape box(sf::Vector2f(cell - 2, cell - 2));
-	box.setPosition(20 + x * cell + 1, 20 + y * cell + 1);
+	float px = 20 + x * cell + 1;
+	float py = 20 + y * cell + 1;
+	float size = cell - 2;
+
+	sf::RectangleShape box(sf::Vector2f(size, size));
+	box.setPosition(px, py);
 	box.setFillColor(color);
 	window.draw(box);
+
+	if (color == sf::Color(40, 40, 52)) return;
+
+	const float t = 3.f;
+	sf::RectangleShape strip;
+
+	strip.setFillColor(sf::Color(255, 255, 255, 100));
+	strip.setSize(sf::Vector2f(size, t));
+	strip.setPosition(px, py);
+	window.draw(strip);
+	strip.setSize(sf::Vector2f(t, size));
+	strip.setPosition(px, py);
+	window.draw(strip);
+
+	strip.setFillColor(sf::Color(0, 0, 0, 100));
+	strip.setSize(sf::Vector2f(size, t));
+	strip.setPosition(px, py + size - t);
+	window.draw(strip);
+	strip.setSize(sf::Vector2f(t, size));
+	strip.setPosition(px + size - t, py);
+	window.draw(strip);
 }
 
 void RendererSFML::draw(const Board& b, const Block& current) {
 	int h = b.getHeight();
 	int w = b.getWidth();
+
+	sf::RectangleShape frame(sf::Vector2f(w * cell, h * cell));
+	frame.setPosition(20, 20);
+	frame.setFillColor(sf::Color::Transparent);
+	frame.setOutlineThickness(3.f);
+	frame.setOutlineColor(sf::Color(255, 255, 255, 180));
+	window.draw(frame);
 
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
@@ -53,9 +85,9 @@ void RendererSFML::drawScore(int score, int best) {
 }
 
 void RendererSFML::drawState(const State& state) {
-	drawText(state.hint(), 20, 632, 14);
+	drawText(state.hint(), 20, 632, 18);
 }
 
 void RendererSFML::drawMessage(const std::string& text) {
-	drawText(text, 20, 656, 14);
+	drawText(text, 20, 656, 18);
 }
